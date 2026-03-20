@@ -75,11 +75,13 @@
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-api</artifactId>
+      <version>6.0.2</version>
       <scope>test</scope>
     </dependency>
     <dependency>
       <groupId>org.junit.jupiter</groupId>
       <artifactId>junit-jupiter-engine</artifactId>
+      <version>6.0.2</version>
       <scope>test</scope>
     </dependency>
     <!-- HSQLDB pour les tests (pas besoin de PostgreSQL en local) -->
