@@ -25,11 +25,11 @@ public class HttpVerticle extends AbstractVerticle {
         .requestHandler(router)
         .listen(port)
         .onSuccess(server -> {
-            System.out.println("Serveur HTTP démarré sur le port " + port);
+            System.out.println("HTTP Server started on port : " + port);
             startPromise.complete();
         })
         .onFailure(err -> {
-            System.err.println("Impossible de démarrer : " + err.getMessage());
+            System.err.println("Failed to start HTTP server : " + err.getMessage());
             startPromise.fail(err);
         });
   }
