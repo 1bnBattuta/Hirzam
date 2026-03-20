@@ -1,13 +1,13 @@
 package com.hirzam;
 
-/**
- * Hello world!
- *
- */
-public class MainVerticle 
-{
-    public static void main( String[] args )
-    {
-        System.out.println( "Hello World!" );
+import io.vertx.core.AbstractVerticle;
+import io.vertx.core.Promise;
+
+public class MainVerticle extends AbstractVerticle {
+    
+    @Override
+    public void start(Promise<Void> startPromise) {
+        System.out.println("Hirzam Chat - Started.");
+        startPromise.complete();
     }
 }
