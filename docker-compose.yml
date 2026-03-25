@@ -1,0 +1,16 @@
+services:
+  postgres:
+    image: postgres:17
+    container_name: hirzamdb
+    environment:
+      POSTGRES_USER: superuser
+      POSTGRES_PASSWORD: "The world revolving"
+      POSTGRES_DB: hirzamdb
+    ports:
+      - "5432:5432"
+    volumes:
+      - hirzam_data:/var/lib/postgresql/data
+    restart: unless-stopped
+
+volumes:
+  hirzam_data:
