@@ -1,5 +1,8 @@
 package com.hirzam;
 
+import com.hirzam.service.MessageService;
+import com.hirzam.service.impl.MessageServiceImpl;
+
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
 import io.vertx.jdbcclient.JDBCConnectOptions;
@@ -12,8 +15,9 @@ public class DatabaseVerticle extends AbstractVerticle {
     private final String dbUser;
     private final String dbPassword;
 
-    // pool must be package visible
+    // pool and messageService must be package visible
     Pool pool;
+    MessageService messageService;
 
     public DatabaseVerticle(String dbUrl, String dbUser, String dbPassword) {
         this.dbUrl      = dbUrl;
@@ -33,6 +37,7 @@ public class DatabaseVerticle extends AbstractVerticle {
         PoolOptions poolOptions = new PoolOptions().setMaxSize(10);
 
         pool = JDBCPool.pool(vertx, connectOptions, poolOptions);
+        messageService = new MessageServiceImpl(pool);
 
         createSchema()
             .onSuccess(x -> {
