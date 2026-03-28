@@ -208,3 +208,123 @@ header h1::before { content: '> '; color: var(--green-d); }
 /* ── Scrollbar ───────────────────────────────────────────────────────────── */
 #messages-container::-webkit-scrollbar       { width: 4px; }
 #messages-container::-webkit-scrollbar-thumb { background: var(--green-d); }
+
+/* ── Message actions (edit / delete buttons) ─────────────────────────────── */
+.message-actions {
+  margin-left: auto;
+  display:     flex;
+  gap:         6px;
+  opacity:     0;
+  transition:  opacity 0.1s;
+}
+
+.message:hover .message-actions {
+  opacity: 1;
+}
+
+.btn-edit,
+.btn-delete {
+  background:  transparent;
+  border:      1px solid var(--green-d);
+  color:       var(--green-d);
+  font-family: inherit;
+  font-size:   0.75rem;
+  padding:     1px 6px;
+  cursor:      pointer;
+  transition:  color 0.1s, border-color 0.1s;
+}
+
+.btn-edit:hover {
+  color:        var(--green);
+  border-color: var(--green);
+}
+
+.btn-delete:hover {
+  color:        var(--danger);
+  border-color: var(--danger);
+}
+
+/* ── Edited badge ────────────────────────────────────────────────────────── */
+.msg-badge {
+  font-size: 0.7rem;
+  color:     var(--green-d);
+}
+
+/* ── Edit modal ──────────────────────────────────────────────────────────── */
+.modal {
+  position:        fixed;
+  inset:           0;
+  background:      rgba(0, 0, 0, 0.8);
+  display:         flex;
+  align-items:     center;
+  justify-content: center;
+  z-index:         100;
+}
+
+.modal.hidden {
+  display: none;
+}
+
+.modal-box {
+  background: var(--surface);
+  border:     1px solid var(--green);
+  padding:    20px;
+  width:      90%;
+  max-width:  480px;
+  display:    flex;
+  flex-direction: column;
+  gap:        12px;
+}
+
+.modal-title {
+  color:          var(--green);
+  font-family:    inherit;
+  letter-spacing: 1px;
+}
+
+.modal-box textarea {
+  background:  var(--bg);
+  border:      1px solid var(--green-d);
+  color:       var(--green);
+  font-family: inherit;
+  font-size:   0.9rem;
+  padding:     8px;
+  resize:      none;
+  outline:     none;
+  width:       100%;
+  caret-color: var(--green);
+}
+
+.modal-box textarea:focus {
+  border-color: var(--green);
+}
+
+.modal-actions {
+  display:         flex;
+  justify-content: flex-end;
+  gap:             10px;
+}
+
+.modal-actions button {
+  background:     transparent;
+  border:         1px solid var(--green-d);
+  color:          var(--green-d);
+  font-family:    inherit;
+  font-size:      0.85rem;
+  padding:        6px 16px;
+  cursor:         pointer;
+  text-transform: uppercase;
+  letter-spacing: 1px;
+  transition:     color 0.1s, border-color 0.1s;
+}
+
+.modal-actions button:hover {
+  color:        var(--green);
+  border-color: var(--green);
+}
+
+#btn-confirm-edit:hover {
+  color:        var(--bg);
+  background:   var(--green);
+  border-color: var(--green);
+}

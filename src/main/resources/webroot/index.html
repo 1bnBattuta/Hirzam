@@ -1,5 +1,5 @@
 <!DOCTYPE html>
-<html lang="en">
+<html lang="fr">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
@@ -15,21 +15,19 @@
       <span id="status-badge" class="badge disconnected">Disconnected</span>
     </header>
 
-    <!-- Message list -->
     <div id="messages-container"></div>
 
-    <!-- Send form -->
     <form id="send-form">
       <input
         id="username"
         type="text"
-        placeholder="Your name"
+        placeholder="Votre nom"
         maxlength="100"
         required
       />
       <textarea
         id="content"
-        placeholder="Your message…"
+        placeholder="Votre message…"
         maxlength="2000"
         required
       ></textarea>
@@ -38,10 +36,20 @@
 
   </div>
 
-  <!-- SockJS + Vert.x EventBus client -->
+  <!-- Edit modal -->
+  <div id="edit-modal" class="modal hidden">
+    <div class="modal-box">
+      <p class="modal-title">> edit message</p>
+      <textarea id="edit-content" rows="4"></textarea>
+      <div class="modal-actions">
+        <button id="btn-cancel-edit">cancel</button>
+        <button id="btn-confirm-edit">confirm</button>
+      </div>
+    </div>
+  </div>
+
   <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
   <script src="https://cdn.jsdelivr.net/npm/vertx3-eventbus-client@3.9.4/vertx-eventbus.js"></script>
-
   <script src="app.js"></script>
 
 </body>
