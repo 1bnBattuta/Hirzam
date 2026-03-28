@@ -9,7 +9,7 @@ import io.vertx.sqlclient.Tuple;
 
 import com.hirzam.service.MessageService;
 
-public class MessageServiceImpl implements MessageService{
+public class MessageServiceImpl implements MessageService {
 
     private final Pool pool;
 
@@ -20,36 +20,43 @@ public class MessageServiceImpl implements MessageService{
     @Override
     public Future<JsonArray> getLastMessages() {
         return pool.query(
-                "SELECT id, username, content, created_at " + 
-                "FROM messages " + 
-                "ORDER BY created_at DESC LIMIT 20"
-            ).execute()
-             .map(rows -> {
-                JsonArray result = new JsonArray();
-                for (Row row : rows) {
-                    result.add(rowToJson(row));
-                }
-                return result;
-            });
+            "SELECT id, username, content, created_at " +
+            "FROM messages " +
+            "ORDER BY created_at DESC LIMIT 20"
+        )
+        .execute()
+        .map(rows -> {
+            JsonArray result = new JsonArray();
+            for (Row row : rows) {
+                result.add(rowToJson(row));
+            }
+            return result;
+        });
     }
 
     @Override
     public Future<JsonObject> addMessage(String username, String content) {
-        return pool
-            .preparedQuery(
-                "INSERT INTO messages (username, content) " +
-                "VALUES ($1, $2) " +
-                "RETURNING id, username, content, created_at"
+        return pool.withTransaction(conn ->
+            conn.preparedQuery(
+                "INSERT INTO messages (username, content) VALUES (?, ?)"
             )
             .execute(Tuple.of(username, content))
-            .map(rows -> rowToJson(rows.iterator().next()));
-   }
+            .compose(ignored ->
+                conn.query(
+                    "SELECT id, username, content, created_at " +
+                    "FROM messages ORDER BY id DESC LIMIT 1"
+                )
+                .execute()
+            )
+            .map(rows -> rowToJson(rows.iterator().next()))
+        );
+    }
 
     private JsonObject rowToJson(Row row) {
         return new JsonObject()
-        .put("id",         row.getInteger("id"))
-        .put("username",   row.getString("username"))
-        .put("content",    row.getString("content"))
-        .put("created_at", row.getLocalDateTime("created_at").toString());
+            .put("id",         row.getInteger("id"))
+            .put("username",   row.getString("username"))
+            .put("content",    row.getString("content"))
+            .put("created_at", row.getLocalDateTime("created_at").toString());
     }
 }

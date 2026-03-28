@@ -5,6 +5,7 @@ import com.hirzam.service.impl.MessageServiceImpl;
 
 import io.vertx.core.AbstractVerticle;
 import io.vertx.core.Promise;
+import io.vertx.core.json.JsonObject;
 import io.vertx.jdbcclient.JDBCConnectOptions;
 import io.vertx.jdbcclient.JDBCPool;
 import io.vertx.sqlclient.Pool;
@@ -32,7 +33,6 @@ public class DatabaseVerticle extends AbstractVerticle {
             .setUser(dbUser)
             .setPassword(dbPassword);
         
-        // TODO: Remove magic number 10 maybe ??
         // Max size is to limit the number of connections with db
         PoolOptions poolOptions = new PoolOptions().setMaxSize(10);
 
@@ -41,6 +41,7 @@ public class DatabaseVerticle extends AbstractVerticle {
 
         createSchema()
             .onSuccess(x -> {
+                registerConsumers();
                 System.out.println("DatabaseVerticle started - db ready");
                 startPromise.complete();
             })
@@ -61,5 +62,32 @@ public class DatabaseVerticle extends AbstractVerticle {
         )
         .execute()
         .mapEmpty();
+    }
+
+    private void registerConsumers() {
+
+        // Consumer 1 — GET last messages
+        vertx.eventBus().<String>consumer(HttpVerticle.EB_GET_MESSAGES, msg -> {
+        messageService.getLastMessages()
+            .onSuccess(arr -> msg.reply(arr.encode()))
+            .onFailure(err -> msg.fail(500, err.getMessage()));
+        });
+
+        // Consumer 2 — ADD a new message
+        vertx.eventBus().<String>consumer(HttpVerticle.EB_ADD_MESSAGE, msg -> {
+            JsonObject body = new JsonObject(msg.body());
+            String username  = body.getString("username");
+            String content   = body.getString("content");
+
+            messageService.addMessage(username, content)
+                .onSuccess(json -> msg.reply(json.encode()))
+                .onFailure(err  -> {
+                    err.printStackTrace();
+                    msg.fail(500, err.getMessage());
+                    
+                }
+                );
+                    
+        });
     }
 }
