@@ -67,29 +67,46 @@ public class DatabaseVerticle extends AbstractVerticle {
     }
 
     private void registerConsumers() {
+        
+        vertx.eventBus().<String>consumer(HttpVerticle.EB_GET_MESSAGES, msg ->
+            messageService.getLastMessages()
+                .onSuccess(arr -> msg.reply(arr.encode()))
+                .onFailure(err -> msg.fail(500, err.getMessage()))
+        );
 
-        // Consumer 1 — GET last messages
-        vertx.eventBus().<String>consumer(HttpVerticle.EB_GET_MESSAGES, msg -> {
-        messageService.getLastMessages()
-            .onSuccess(arr -> msg.reply(arr.encode()))
+        vertx.eventBus().<String>consumer(HttpVerticle.EB_ADD_MESSAGE, msg -> {
+            JsonObject body = new JsonObject(msg.body());
+            messageService.addMessage(
+                body.getString("username"),
+                body.getString("content")
+            )
+            .onSuccess(json -> msg.reply(json.encode()))
             .onFailure(err -> msg.fail(500, err.getMessage()));
         });
 
-        // Consumer 2 — ADD a new message
-        vertx.eventBus().<String>consumer(HttpVerticle.EB_ADD_MESSAGE, msg -> {
-            JsonObject body = new JsonObject(msg.body());
-            String username  = body.getString("username");
-            String content   = body.getString("content");
+        // ── Bonus consumers ───────────────────────────────────────────────────────
 
-            messageService.addMessage(username, content)
+        vertx.eventBus().<String>consumer(HttpVerticle.EB_GET_MESSAGE, msg -> {
+            int id = new JsonObject(msg.body()).getInteger("id");
+            messageService.getMessage(id)
                 .onSuccess(json -> msg.reply(json.encode()))
-                .onFailure(err  -> {
-                    err.printStackTrace();
-                    msg.fail(500, err.getMessage());
-                    
-                }
-                );
-                    
+                .onFailure(err -> msg.fail(404, err.getMessage()));
+        });
+
+        vertx.eventBus().<String>consumer(HttpVerticle.EB_UPDATE_MESSAGE, msg -> {
+            JsonObject body = new JsonObject(msg.body());
+            int    id      = body.getInteger("id");
+            String content = body.getString("content");
+            messageService.updateMessage(id, content)
+                .onSuccess(json -> msg.reply(json.encode()))
+                .onFailure(err -> msg.fail(404, err.getMessage()));
+        });
+
+        vertx.eventBus().<String>consumer(HttpVerticle.EB_DELETE_MESSAGE, msg -> {
+            int id = new JsonObject(msg.body()).getInteger("id");
+            messageService.deleteMessage(id)
+                .onSuccess(v   -> msg.reply(""))
+                .onFailure(err -> msg.fail(404, err.getMessage()));
         });
     }
 }
