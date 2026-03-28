@@ -1,0 +1,210 @@
+/* ── Reset ───────────────────────────────────────────────────────────────── */
+*, *::before, *::after {
+  box-sizing: border-box;
+  margin:     0;
+  padding:    0;
+}
+
+/* ── Variables ───────────────────────────────────────────────────────────── */
+:root {
+  --bg:      #0a0a0a;
+  --surface: #111111;
+  --border:  #00ff0044;
+  --green:   #00ff00;
+  --green-d: #00aa00;
+  --dim:     #005500;
+  --text:    #00ff00;
+  --radius:  0px;
+}
+
+/* ── Layout ──────────────────────────────────────────────────────────────── */
+body {
+  font-family:      'Courier New', Courier, monospace;
+  background:       var(--bg);
+  color:            var(--text);
+  height:           100vh;
+  display:          flex;
+  align-items:      center;
+  justify-content:  center;
+  padding:          20px;
+}
+
+.app {
+  width:          100%;
+  max-width:      780px;
+  height:         100%;
+  display:        flex;
+  flex-direction: column;
+  gap:            12px;
+}
+
+/* ── Header ──────────────────────────────────────────────────────────────── */
+header {
+  display:     flex;
+  align-items: center;
+  gap:         12px;
+  border-bottom: 1px solid var(--green-d);
+  padding-bottom: 8px;
+}
+
+header h1 {
+  font-size:   1.2rem;
+  font-weight: normal;
+  letter-spacing: 2px;
+  text-transform: uppercase;
+}
+
+header h1::before { content: '> '; color: var(--green-d); }
+
+/* ── Badge ───────────────────────────────────────────────────────────────── */
+.badge {
+  font-size:  0.75rem;
+  padding:    2px 6px;
+  border:     1px solid currentColor;
+  font-family: inherit;
+}
+
+.badge.connected    { color: var(--green);   border-color: var(--green); }
+.badge.disconnected { color: var(--green-d); border-color: var(--green-d); }
+
+.badge.connected::before    { content: '[ON]  '; }
+.badge.disconnected::before { content: '[OFF] '; }
+
+/* ── Messages container ──────────────────────────────────────────────────── */
+#messages-container {
+  flex:            1;
+  overflow-y:      auto;
+  background:      var(--surface);
+  border:          1px solid var(--green-d);
+  padding:         12px;
+  display:         flex;
+  flex-direction:  column;
+  gap:             6px;
+  scroll-behavior: smooth;
+}
+
+#messages-container:empty::after {
+  content:    '-- no messages yet --';
+  color:      var(--dim);
+  text-align: center;
+  margin:     auto;
+}
+
+/* ── Message bubble ──────────────────────────────────────────────────────── */
+.message {
+  display:        flex;
+  flex-direction: column;
+  gap:            2px;
+  padding:        4px 0;
+  border-bottom:  1px solid #001100;
+  animation:      fadeIn 0.1s ease;
+}
+
+.message:last-child { border-bottom: none; }
+
+@keyframes fadeIn {
+  from { opacity: 0; }
+  to   { opacity: 1; }
+}
+
+.message-header {
+  display: flex;
+  gap:     12px;
+}
+
+.message-username {
+  color:       var(--green);
+  font-weight: bold;
+  min-width:   120px;
+}
+
+.message-username::before { content: '<'; }
+.message-username::after  { content: '>'; }
+
+.message-time {
+  color:     var(--green-d);
+  font-size: 0.8rem;
+}
+
+.message-time::before { content: '['; }
+.message-time::after  { content: ']'; }
+
+.message-content {
+  color:       var(--text);
+  padding-left: 4px;
+  line-height: 1.4;
+  word-break:  break-word;
+}
+
+.message-content::before { content: '$ '; color: var(--green-d); }
+
+/* ── Form ────────────────────────────────────────────────────────────────── */
+#send-form {
+  background:     var(--surface);
+  border:         1px solid var(--green-d);
+  padding:        12px;
+  display:        flex;
+  flex-direction: column;
+  gap:            8px;
+}
+
+#send-form input,
+#send-form textarea {
+  width:       100%;
+  background:  var(--bg);
+  border:      1px solid var(--green-d);
+  color:       var(--green);
+  padding:     8px;
+  font-size:   0.9rem;
+  font-family: inherit;
+  outline:     none;
+  resize:      none;
+  caret-color: var(--green);
+  transition:  border-color 0.1s;
+}
+
+#send-form input:focus,
+#send-form textarea:focus {
+  border-color: var(--green);
+}
+
+#send-form input {
+  max-width: 220px;
+}
+
+#send-form input::placeholder,
+#send-form textarea::placeholder {
+  color: var(--dim);
+}
+
+#send-form textarea { height: 60px; }
+
+#send-form button {
+  align-self:  flex-end;
+  background:  transparent;
+  color:       var(--green);
+  border:      1px solid var(--green);
+  padding:     8px 20px;
+  font-size:   0.9rem;
+  font-family: inherit;
+  cursor:      pointer;
+  text-transform: uppercase;
+  letter-spacing: 2px;
+  transition:  background 0.1s, color 0.1s;
+}
+
+#send-form button::before { content: '> '; }
+
+#send-form button:hover {
+  background: var(--green);
+  color:      var(--bg);
+}
+
+#send-form button:disabled {
+  opacity: 0.3;
+  cursor:  not-allowed;
+}
+
+/* ── Scrollbar ───────────────────────────────────────────────────────────── */
+#messages-container::-webkit-scrollbar       { width: 4px; }
+#messages-container::-webkit-scrollbar-thumb { background: var(--green-d); }

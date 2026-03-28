@@ -1,10 +1,48 @@
 <!DOCTYPE html>
-<html lang="fr">
+<html lang="en">
 <head>
-  <meta charset="UTF-8"/>
-  <title>Vertx Chat</title>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Hirzam Chat</title>
+  <link rel="stylesheet" href="style.css" />
 </head>
 <body>
-  <h1>Vertx Chat — Working On It <|°-°|> </h1>
+
+  <div class="app">
+
+    <header>
+      <h1> Hirzam Chat</h1>
+      <span id="status-badge" class="badge disconnected">Disconnected</span>
+    </header>
+
+    <!-- Message list -->
+    <div id="messages-container"></div>
+
+    <!-- Send form -->
+    <form id="send-form">
+      <input
+        id="username"
+        type="text"
+        placeholder="Your name"
+        maxlength="100"
+        required
+      />
+      <textarea
+        id="content"
+        placeholder="Your message…"
+        maxlength="2000"
+        required
+      ></textarea>
+      <button type="submit">Send</button>
+    </form>
+
+  </div>
+
+  <!-- SockJS + Vert.x EventBus client -->
+  <script src="https://cdn.jsdelivr.net/npm/sockjs-client@1.6.1/dist/sockjs.min.js"></script>
+  <script src="https://cdn.jsdelivr.net/npm/vertx3-eventbus-client@3.9.4/vertx-eventbus.js"></script>
+
+  <script src="app.js"></script>
+
 </body>
 </html>
