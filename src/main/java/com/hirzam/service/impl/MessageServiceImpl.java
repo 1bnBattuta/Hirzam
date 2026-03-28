@@ -17,11 +17,14 @@ public class MessageServiceImpl implements MessageService {
         this.pool = pool;
     }
 
+    // ── getLastMessages ───────────────────────────────────────────────────────
+
     @Override
     public Future<JsonArray> getLastMessages() {
         return pool.query(
-            "SELECT id, username, content, created_at " +
+            "SELECT id, username, content, created_at, updated, deleted " +
             "FROM messages " +
+            "WHERE deleted = FALSE " +
             "ORDER BY created_at DESC LIMIT 20"
         )
         .execute()
@@ -34,6 +37,8 @@ public class MessageServiceImpl implements MessageService {
         });
     }
 
+    // ── addMessage ────────────────────────────────────────────────────────────
+
     @Override
     public Future<JsonObject> addMessage(String username, String content) {
         return pool.withTransaction(conn ->
@@ -43,7 +48,7 @@ public class MessageServiceImpl implements MessageService {
             .execute(Tuple.of(username, content))
             .compose(ignored ->
                 conn.query(
-                    "SELECT id, username, content, created_at " +
+                    "SELECT id, username, content, created_at, updated, deleted " +
                     "FROM messages ORDER BY id DESC LIMIT 1"
                 )
                 .execute()
@@ -52,11 +57,72 @@ public class MessageServiceImpl implements MessageService {
         );
     }
 
+    // ── getMessage ────────────────────────────────────────────────────────────
+
+    @Override
+    public Future<JsonObject> getMessage(int id) {
+        return pool.preparedQuery(
+            "SELECT id, username, content, created_at, updated, deleted " +
+            "FROM messages WHERE id = ? AND deleted = FALSE"
+        )
+        .execute(Tuple.of(id))
+        .map(rows -> {
+            if (!rows.iterator().hasNext()) {
+                throw new RuntimeException("Message not found");
+            }
+            return rowToJson(rows.iterator().next());
+        });
+    }
+
+    // ── updateMessage ─────────────────────────────────────────────────────────
+
+    @Override
+    public Future<JsonObject> updateMessage(int id, String content) {
+        return pool.withTransaction(conn ->
+            conn.preparedQuery(
+                "UPDATE messages SET content = ?, updated = TRUE " +
+                "WHERE id = ? AND deleted = FALSE"
+            )
+            .execute(Tuple.of(content, id))
+            .compose(res -> {
+                if (res.rowCount() == 0) {
+                    throw new RuntimeException("Message not found or already deleted");
+                }
+                return conn.preparedQuery(
+                    "SELECT id, username, content, created_at, updated, deleted " +
+                    "FROM messages WHERE id = ?"
+                )
+                .execute(Tuple.of(id));
+            })
+            .map(rows -> rowToJson(rows.iterator().next()))
+        );
+    }
+
+    // ── deleteMessage ─────────────────────────────────────────────────────────
+
+    @Override
+    public Future<Void> deleteMessage(int id) {
+        return pool.preparedQuery(
+            "UPDATE messages SET deleted = TRUE WHERE id = ? AND deleted = FALSE"
+        )
+        .execute(Tuple.of(id))
+        .map(res -> {
+            if (res.rowCount() == 0) {
+                throw new RuntimeException("Message not found or already deleted");
+            }
+            return null;
+        });
+    }
+
+    // ── rowToJson ─────────────────────────────────────────────────────────────
+
     private JsonObject rowToJson(Row row) {
         return new JsonObject()
             .put("id",         row.getInteger("id"))
             .put("username",   row.getString("username"))
             .put("content",    row.getString("content"))
-            .put("created_at", row.getLocalDateTime("created_at").toString());
+            .put("created_at", row.getLocalDateTime("created_at").toString())
+            .put("updated",    row.getBoolean("updated"))
+            .put("deleted",    row.getBoolean("deleted"));
     }
 }
