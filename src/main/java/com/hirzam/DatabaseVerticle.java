@@ -54,10 +54,12 @@ public class DatabaseVerticle extends AbstractVerticle {
     private io.vertx.core.Future<Void> createSchema() {
         return pool.query(
             "CREATE TABLE IF NOT EXISTS messages (" +
-                "id         SERIAL PRIMARY KEY, "     +
-                "username   VARCHAR(100) NOT NULL, "  +
-                "content    TEXT NOT NULL, "          +
-                "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP" +
+                "id         SERIAL PRIMARY KEY, "              +
+                "username   VARCHAR(100) NOT NULL, "           +
+                "content    TEXT NOT NULL, "                   +
+                "created_at TIMESTAMP NOT NULL DEFAULT CURRENT_TIMESTAMP, " +
+                "updated    BOOLEAN NOT NULL DEFAULT FALSE, "  +
+                "deleted    BOOLEAN NOT NULL DEFAULT FALSE"    +
             ")"
         )
         .execute()
