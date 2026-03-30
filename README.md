@@ -43,7 +43,7 @@ All connected browsers
 
 ## Database setup
 
-Start a PostgreSQL container for podman:
+### With Podman
 ```bash
 podman run --name chatdb \
   -e POSTGRES_DB=hirzamdb \
@@ -53,12 +53,28 @@ podman run --name chatdb \
   -d postgres:16
 ```
 
-The schema is created automatically on first startup if no schema exists.
+### With Docker
+```bash
+docker run --name chatdb \
+  -e POSTGRES_DB=hirzamdb \
+  -e POSTGRES_USER=superuser \
+  -e POSTGRES_PASSWORD="The world revolving" \
+  -p 5432:5432 \
+  -d postgres:16
+```
+
+The command is identical — just replace `podman` with `docker`.
+The schema is created automatically on first startup.
 
 Stop / start the container between sessions:
 ```bash
+# Podman
 podman stop chatdb
 podman start chatdb
+
+# Docker
+docker stop chatdb
+docker start chatdb
 ```
 
 ---
