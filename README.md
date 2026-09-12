@@ -1,5 +1,7 @@
 # Hirzam Chat
 
+School project - IMT Atlantique, 2nd year software architecture course, February 2026. Built collaboratively by a team of 3 students over 3 weeks. This repository is kept public as a reference.
+
 A real-time instant messaging application built with **Vert.x 5**,
 **PostgreSQL** and **SockJS**.
 
